@@ -1,5 +1,6 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
+require('dotenv').config()
 const tw = require('twilio')(process.env.accountSid,process.env.authToken);
 const filter = (reaction,user)=>['▶️','⏸️','⏭️'].includes(reaction.emoji.name)&&(user.id!=client.user.id);
 
