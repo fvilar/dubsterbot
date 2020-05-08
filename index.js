@@ -43,12 +43,17 @@ async function mostrarMemes(channel){
 
 
 
+/*
+FB.api(
+  '/me',
+  'GET',
+  {"fields":"posts.limit(20){message,attachments.limit(1){target,subattachments,type,media,unshimmed_url}}"},
+  function(response) {
+      // Insert your code here
+  }
+);
 
-
-
-
-
-
+*/
 
 
 
