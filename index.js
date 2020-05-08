@@ -4,20 +4,87 @@ const tw = require('twilio')(process.env.accountSid,process.env.authToken);
 const filter = (reaction,user)=>['▶️','⏸️','⏭️'].includes(reaction.emoji.name)&&(user.id!=client.user.id);
 
 
+
+const fb = require('fb');
+fb.setAccessToken(process.env.fbkey);
+                    
+var ultimo_meme = {};
+
+async function mostrarMemes(channel){
+    let guild = channel.guild;
+    let sigue = true;
+    fb.api(
+        "/417445035653004/posts/?fields=full_picture&limit=20",
+        function (response) {
+          if (response && !response.error) {            
+            response.data.map(async value=>{
+                if(sigue&&value&&value.full_picture){
+                    if(ultimo_meme[guild]===value.id){
+                        sigue = false;
+                    }
+                    else{
+                        await channel.send({
+                            files: [{
+                                attachment: value.full_picture                                             
+                            }]
+                        }) 
+                    }
+                }                         
+            });
+            ultimo_meme[guild]=response.data[0].id;
+            setTimeout(()=>{mostrarMemes(channel)},18000);
+          }else{
+              console.log(response.error);              
+          }
+        }
+    );
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 client.on('guildCreate',(guild)=>{
     
     let musica =guild.channels.cache.find(channel=>channel.name=="musica");
-    if(musica){                                        
-        musica.send("**LISTO PARA ESCUCHAR MUSICA SEMPAII!** \nhttps://tenor.com/view/listening-to-music-dancing-music-notes-enjoying-gif-14460643");                        
+    let memes =guild.channels.cache.find(channel=>channel.name=="memes");
+    let parent = guild.channels.cache.find(channel=>channel.name=="general").parent;
+    if(!musica){                                        
+        guild.channels.create("musica",{type:"text",parent:parent,position:1})
+            .then(channel=>channel.send("**LISTO PARA ESCUCHAR MUSICA SEMPAII!** \nhttps://tenor.com/view/listening-to-music-dancing-music-notes-enjoying-gif-14460643"));
     }
     else{
-        // CREAR EL CANAL DE MUSICA        
+        musica.send("**LISTO PARA ESCUCHAR MUSICA SEMPAII!** \nhttps://tenor.com/view/listening-to-music-dancing-music-notes-enjoying-gif-14460643");                        
     }
+    if(!memes){
+        guild.channels.create("memes",{type:"text",parent:parent,position:2})
+            .then(channel=>mostrarMemes(channel));                     
+    }    
+    else{
+        mostrarMemes(memes);
+    }    
+
 })
 
 
 client.once('ready', () => {    
-    console.log('Ready!');                              
+    console.log('Ready!');   
+
+    client.guilds.cache.map(guild=>{
+         memes = guild.channels.cache.find(channel=>channel.name=="memes");
+         if(memes)
+            mostrarMemes(memes);
+    });
 });
 
 client.on('message',(message)=>{        
@@ -40,14 +107,20 @@ client.on('message',(message)=>{
         message.channel.send(ms);
     }
     else if(message.author.bot){
-        if(message.author==client.user){           
-            setTimeout(()=>{message.delete();},10000);                       
+        if(message.author==client.user){
+            if(message.channel.name!="memes"){
+                setTimeout(()=>{message.delete();},10000);                       
+            }           
         }        
         else{
             setTimeout(()=>{message.delete();},300);                       
         }
 
-    }/*
+    }
+    else if(!message.author.bot){
+
+    }
+    /*
     else if(!message.author.bot&&message.content.startsWith(".")){
      message.channel.send("enviando mensaje...");
      let mensaje = message.content;     
@@ -62,20 +135,28 @@ client.on('message',(message)=>{
     
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////    
-    else if(message.content===".console"&&message.channel.name=="musica"){                               
+   /* else if(message.content===".console"&&message.channel.name=="musica"){                               
         message.channel.send("**LISTO PARA ESCUCHAR MUSICA SEMPAII!** \nhttps://tenor.com/view/listening-to-music-dancing-music-notes-enjoying-gif-14460643").then(async message=>{                                                                                
         })                                                                                            
     .catch(error=>console.log(error.message))                            
     }
-    if(message.content===".cls"){               
+    */
+    
+    if(message.content===".cls"){       
+        message.channel.bulkDelete(100,false)
+            .then(()=>message.channel.send("mensajes eliminados correctamente"));
+        /*                
         message.channel.messages.fetch()
-            .then(collection=>{                                
-                collection.map(message=>{
-                    message.delete()                        
+            .then(async collection=>{                                
+                 await collection.map(async message=>{
+                     if(message){
+                      await message.delete()                        
                         .catch(error=>console.log(error))
+                    }
                 })                   
-            })                        
-            .catch(error=>console.log(error))    
+            })
+            .then(canCls=true)                        
+            .catch(error=>{console.log(error);canCls=true;})    */
     }
 });
 
