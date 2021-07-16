@@ -53,11 +53,12 @@ module.exports = {
                     .then(()=>comando.channel.send("mensajes eliminados correctamente"));
             },
           '.pedison': {
-            nombre:".pedison",
-            descripcion:"Putear a Edison",
-            ejecutar:(comando)=>{
-                comando.channel.send("Ptm Edison me tienes hasta la vrg!");
-            }
+                nombre:".pedison",
+                descripcion:"Putear a Edison",
+                ejecutar:(comando)=>{
+                    comando.channel.send("Ptm Edison me tienes hasta la vrg!");
+                }
+          }
         }
     }
 }
