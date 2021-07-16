@@ -60,7 +60,7 @@ module.exports = {
       nombre: ".pedison",
       descripcion: "Putear a Edison",
       ejecutar: (comando) => {
-        comando.channel.send("Ptm Edison me tienes hasta la vrg!");
+        comando.channel.send("/tts Ptm Edison me tienes hasta la vrg!! :upside_down:");
       },
     },
   },
